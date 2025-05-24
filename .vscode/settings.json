@@ -1,0 +1,8 @@
+{
+  "cSpell.words": ["chatx"],
+  "files.exclude": {
+    "**/_build": true,
+    "**/data": true,
+    "**/.elixir_ls": true
+  }
+}
