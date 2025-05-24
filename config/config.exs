@@ -8,7 +8,6 @@
 import Config
 
 config :chatx,
-  ecto_repos: [Chatx.Repo],
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint

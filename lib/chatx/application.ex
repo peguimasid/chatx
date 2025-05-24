@@ -9,7 +9,6 @@ defmodule Chatx.Application do
   def start(_type, _args) do
     children = [
       ChatxWeb.Telemetry,
-      # Chatx.Repo,
       {DNSCluster, query: Application.get_env(:chatx, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Chatx.PubSub},
       # Start the Finch HTTP client for sending emails
