@@ -11,6 +11,7 @@ defmodule Chatx.Application do
       ChatxWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:chatx, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Chatx.PubSub},
+      ChatxWeb.Presence,
       # Start the Finch HTTP client for sending emails
       {Finch, name: Chatx.Finch},
       # Start a worker by calling: Chatx.Worker.start_link(arg)

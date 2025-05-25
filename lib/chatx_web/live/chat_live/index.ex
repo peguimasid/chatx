@@ -1,15 +1,48 @@
 defmodule ChatxWeb.ChatLive.Index do
   use ChatxWeb, :live_view
 
+  alias ChatxWeb.Presence
+
   def mount(_params, _session, socket) do
-    online_users = 7
+    %{user_name: user_name} = socket.assigns
+
+    if connected?(socket) do
+      if user_name do
+        Presence.track_user(user_name)
+        Presence.subscribe()
+      end
+    end
+
+    online_users_count = Presence.count_users()
 
     socket =
       socket
-      |> assign(:page_title, "#{online_users} users")
-      |> assign(:online_users_count, online_users)
+      |> assign(:page_title, "#{online_users_count} users")
+      |> assign(:online_users_count, online_users_count)
 
     {:ok, socket, layout: false}
+  end
+
+  def handle_info({:user_joined, _presence}, socket) do
+    online_users_count = Presence.count_users()
+
+    socket =
+      socket
+      |> assign(:online_users_count, online_users_count)
+      |> assign(:page_title, "#{online_users_count} users")
+
+    {:noreply, socket}
+  end
+
+  def handle_info({:user_left, _presence}, socket) do
+    online_users_count = Presence.count_users()
+
+    socket =
+      socket
+      |> assign(:online_users_count, online_users_count)
+      |> assign(:page_title, "#{online_users_count} users")
+
+    {:noreply, socket}
   end
 
   def render(assigns) do
