@@ -26,13 +26,12 @@ defmodule ChatxWeb.HomeLive.Index do
     <div class="mx-auto max-w-sm mt-20">
       <div class="rounded-lg border p-6">
         <h2 class="text-2xl font-bold mb-6 text-center">Welcome to Chatx</h2>
-
         <%= if @user_name do %>
-          <div class="text-center space-y-6">
-            <p class="mb-4">Welcome back, <strong><%= @user_name %></strong>!</p>
+          <div class="text-center space-y-4">
+            <p>Welcome back, <strong><%= @user_name %></strong>!</p>
             <.link
               navigate={~p"/chat"}
-              class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+              class="w-full bg-zinc-900 hover:bg-zinc-700 text-white py-2 px-6 rounded-lg inline-block text-center"
             >
               Continue to Chat
             </.link>
