@@ -17,8 +17,14 @@ defmodule ChatxWeb.Router do
   scope "/", ChatxWeb do
     pipe_through :browser
 
-    live "/", HomeLive.Index
-    live "/chat", ChatLive.Index
+    # Session management routes
+    post "/users/join-chat", UserSessionController, :create
+    delete "/users/leave-chat", UserSessionController, :delete
+
+    live_session :default, on_mount: [{ChatxWeb.Plugs.AssignCurrentUser, :assign_current_user}] do
+      live "/", HomeLive.Index
+      live "/chat", ChatLive.Index
+    end
   end
 
   # Other scopes may use custom stacks.
