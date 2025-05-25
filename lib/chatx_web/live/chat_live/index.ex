@@ -2,9 +2,12 @@ defmodule ChatxWeb.ChatLive.Index do
   use ChatxWeb, :live_view
 
   def mount(_params, _session, socket) do
+    online_users = 7
+
     socket =
       socket
-      |> assign(:page_title, "8 users")
+      |> assign(:page_title, "#{online_users} users")
+      |> assign(:online_users_count, online_users)
 
     {:ok, socket, layout: false}
   end
@@ -17,9 +20,14 @@ defmodule ChatxWeb.ChatLive.Index do
           <a href="/" class="flex gap-2 items-center">
             <.icon name="hero-chat-bubble-left-right" class="size-6" /> Chatx
           </a>
-          <div class="flex items-center gap-4">
-            <p>Welcome, <strong>{@user_name}</strong></p>
-            <p>8 users online</p>
+          <div class="flex items-center gap-7">
+            <div class="flex items-center gap-2 relative">
+              <p>{@online_users_count} users online</p>
+              <div class="absolute -top-1 -right-1">
+                <div class="size-2 bg-green-500 rounded-full" />
+                <div class="absolute inset-0 size-2 bg-green-500 rounded-full animate-ping" />
+              </div>
+            </div>
             <.link
               href={~p"/users/leave-chat"}
               method="delete"
