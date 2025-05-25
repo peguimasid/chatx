@@ -1,23 +1,12 @@
 defmodule ChatxWeb.ChatLive.Index do
   use ChatxWeb, :live_view
 
-  on_mount {ChatxWeb.Plugs.AssignCurrentUser, :assign_current_user}
-
   def mount(_params, _session, socket) do
-    if is_nil(socket.assigns.user_name) do
-      socket =
-        socket
-        |> put_flash(:error, "Please provide a name to join the chat.")
-        |> push_navigate(to: ~p"/")
+    socket =
+      socket
+      |> assign(:page_title, "8 users")
 
-      {:ok, socket}
-    else
-      socket =
-        socket
-        |> assign(:page_title, "8 users")
-
-      {:ok, socket, layout: false}
-    end
+    {:ok, socket, layout: false}
   end
 
   def render(assigns) do

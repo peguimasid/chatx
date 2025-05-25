@@ -21,8 +21,13 @@ defmodule ChatxWeb.Router do
     post "/users/join-chat", UserSessionController, :create
     delete "/users/leave-chat", UserSessionController, :delete
 
-    live_session :default, on_mount: [{ChatxWeb.Plugs.AssignCurrentUser, :assign_current_user}] do
+    live_session :assign_user,
+      on_mount: [{ChatxWeb.UserSession, :assign_current_user}] do
       live "/", HomeLive.Index
+    end
+
+    live_session :require_user,
+      on_mount: [{ChatxWeb.UserSession, :require_user}] do
       live "/chat", ChatLive.Index
     end
   end
