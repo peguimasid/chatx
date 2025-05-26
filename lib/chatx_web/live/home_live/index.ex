@@ -120,7 +120,7 @@ defmodule ChatxWeb.HomeLive.Index do
             />
 
             <:actions>
-              <.button class="w-full" disabled={@form.errors != []}>
+              <.button class="w-full" phx-disable-with="Joining...">
                 Join Chat <span aria-hidden="true">→</span>
               </.button>
             </:actions>

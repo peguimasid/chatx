@@ -13,7 +13,7 @@ defmodule ChatxWeb.ChatLive.Index do
       end
     end
 
-    online_users_count = Presence.count_users()
+    online_users_count = count_other_users()
 
     socket =
       socket
@@ -24,7 +24,7 @@ defmodule ChatxWeb.ChatLive.Index do
   end
 
   def handle_info({:user_joined, _presence}, socket) do
-    online_users_count = Presence.count_users()
+    online_users_count = count_other_users()
 
     socket =
       socket
@@ -35,7 +35,7 @@ defmodule ChatxWeb.ChatLive.Index do
   end
 
   def handle_info({:user_left, _presence}, socket) do
-    online_users_count = Presence.count_users()
+    online_users_count = count_other_users()
 
     socket =
       socket
@@ -43,6 +43,11 @@ defmodule ChatxWeb.ChatLive.Index do
       |> assign(:page_title, "#{online_users_count} users")
 
     {:noreply, socket}
+  end
+
+  defp count_other_users do
+    # Not count current user
+    Presence.count_users() - 1
   end
 
   def render(assigns) do
@@ -55,7 +60,16 @@ defmodule ChatxWeb.ChatLive.Index do
           </a>
           <div class="flex items-center gap-7">
             <div class="flex items-center gap-2 relative">
-              <p>{@online_users_count} users online</p>
+              <p>
+                <%= cond do %>
+                  <% @online_users_count == 0 -> %>
+                    Just you in the room
+                  <% @online_users_count == 1 -> %>
+                    1 user online
+                  <% true -> %>
+                    {@online_users_count} users online
+                <% end %>
+              </p>
               <div class="absolute -top-1 -right-1">
                 <div class="size-2 bg-green-500 rounded-full" />
                 <div class="absolute inset-0 size-2 bg-green-500 rounded-full animate-ping" />
