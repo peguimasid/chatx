@@ -6,6 +6,7 @@ defmodule Chatx.Chat.ChatServer do
 
   use GenServer
   require Logger
+  alias Chatx.Chat
   alias Chatx.Chat.Message
 
   @name __MODULE__
@@ -34,7 +35,6 @@ defmodule Chatx.Chat.ChatServer do
   end
 
   def handle_call(:recent_messages, _from, state) do
-    # Return messages in chronological order (oldest first) for display
     messages = Enum.reverse(state.messages)
     {:reply, messages, state}
   end
@@ -44,11 +44,11 @@ defmodule Chatx.Chat.ChatServer do
 
     case Message.valid?(message) do
       true ->
-        # Store messages with newest first, then limit to cache_size
         new_messages =
           [message | state.messages]
           |> Enum.take(state.cache_size)
 
+        Chat.broadcast({:new_message, message})
         new_state = %{state | messages: new_messages}
         {:reply, {:ok, message}, new_state}
 
