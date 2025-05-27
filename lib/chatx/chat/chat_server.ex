@@ -20,8 +20,8 @@ defmodule Chatx.Chat.ChatServer do
     GenServer.start_link(__MODULE__, %State{}, name: @name)
   end
 
-  def add_message(content, user_name) do
-    GenServer.call(@name, {:add_message, content, user_name})
+  def add_message(content, author) do
+    GenServer.call(@name, {:add_message, content, author})
   end
 
   def recent_messages() do
@@ -39,8 +39,8 @@ defmodule Chatx.Chat.ChatServer do
     {:reply, messages, state}
   end
 
-  def handle_call({:add_message, content, user_name}, _from, state) do
-    message = Message.new(content, user_name)
+  def handle_call({:add_message, content, author}, _from, state) do
+    message = Message.new(content, author)
 
     case Message.valid?(message) do
       true ->

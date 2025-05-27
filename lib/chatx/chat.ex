@@ -11,8 +11,8 @@ defmodule Chatx.Chat do
     ChatServer.recent_messages()
   end
 
-  def create_message(content, user_name) do
-    ChatServer.add_message(content, user_name)
+  def create_message(content, author) do
+    ChatServer.add_message(content, author)
   end
 
   def subscribe do

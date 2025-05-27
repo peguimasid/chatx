@@ -3,13 +3,13 @@ defmodule Chatx.Chat.Message do
   Message struct for chat messages.
   """
 
-  defstruct [:id, :content, :user_name, :inserted_at]
+  defstruct [:id, :content, :author, :inserted_at]
 
-  def new(content, user_name) do
+  def new(content, author) do
     %__MODULE__{
       id: System.unique_integer([:positive]),
       content: String.trim(content),
-      user_name: user_name,
+      author: author,
       inserted_at: DateTime.utc_now()
     }
   end
