@@ -35,7 +35,12 @@ defmodule ChatxWeb.ChatLive.Index do
       Chatx.Chat.ChatServer.add_message(message_content, user_name)
     end
 
-    {:noreply, assign(socket, :new_message, "")}
+    socket =
+      socket
+      |> assign(:new_message, "")
+      |> push_event("scroll-to-bottom", %{})
+
+    {:noreply, socket}
   end
 
   def handle_event("form_change", %{"message" => message_content}, socket) do
@@ -108,7 +113,11 @@ defmodule ChatxWeb.ChatLive.Index do
           </div>
         </div>
       </header>
-      <main class="size-full overflow-auto px-4 py-20 sm:px-6 lg:px-8">
+      <main
+        class="size-full overflow-auto px-4 py-20 sm:px-6 lg:px-8"
+        id="chat-container"
+        phx-hook="ScrollToBottom"
+      >
         <div class="mx-auto max-w-2xl">
           <.flash_group flash={@flash} />
           <div id="messages" phx-update="stream" class="space-y-4 mb-8">
@@ -133,7 +142,10 @@ defmodule ChatxWeb.ChatLive.Index do
                   </p>
                 </div>
                 <div>
-                  <div class="flex items-center justify-end gap-1 text-sm text-gray-600">
+                  <div class={[
+                    "flex items-center gap-1 text-sm text-gray-600",
+                    if(message.author == @user_name, do: "justify-end", else: "justify-start")
+                  ]}>
                     <span class="font-medium">
                       {if message.author == @user_name, do: "You", else: message.author}
                     </span>
