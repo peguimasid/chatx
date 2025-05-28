@@ -10,17 +10,12 @@ defmodule ChatxWeb.ChatLive.Index do
     if connected?(socket) do
       # Chatx.Chat.ChatServer.add_message("Hello guys", "masid")
       # Chatx.Chat.ChatServer.add_message("Where are you?", "gmasid")
-
-      if user_name do
-        Presence.track_user(user_name)
-        Presence.subscribe()
-      end
+      Presence.track_user(user_name)
+      Presence.subscribe()
+      Chat.subscribe()
     end
 
     recent_messages = Chat.list_recent_messages()
-
-    # IO.inspect(recent_messages)
-
     online_users_count = count_other_users()
 
     socket =
@@ -31,6 +26,20 @@ defmodule ChatxWeb.ChatLive.Index do
       |> stream(:message, recent_messages, reset: true)
 
     {:ok, socket, layout: false}
+  end
+
+  def handle_event("send_message", %{"message" => message_content}, socket) do
+    %{user_name: user_name} = socket.assigns
+
+    if String.trim(message_content) != "" do
+      Chatx.Chat.ChatServer.add_message(message_content, user_name)
+    end
+
+    {:noreply, assign(socket, :new_message, "")}
+  end
+
+  def handle_event("form_change", %{"message" => message_content}, socket) do
+    {:noreply, assign(socket, :new_message, message_content)}
   end
 
   def handle_info({:user_joined, _presence}, socket) do
@@ -55,8 +64,11 @@ defmodule ChatxWeb.ChatLive.Index do
     {:noreply, socket}
   end
 
+  def handle_info({:new_message, message}, socket) do
+    {:noreply, stream_insert(socket, :message, message)}
+  end
+
   defp count_other_users do
-    # Not count current user
     Presence.count_users() - 1
   end
 
@@ -135,8 +147,30 @@ defmodule ChatxWeb.ChatLive.Index do
           </div>
         </div>
       </main>
-      <footer class="sticky bottom-0 z-10 flex min-h-14 w-full justify-center bg-white">
-        <div class="max-w-2xl w-full border h-10 rounded-lg">Simulate input</div>
+      <footer class="sticky bottom-0 z-10 flex w-full justify-center items-center min-h-14">
+        <div class="max-w-2xl w-full">
+          <.form
+            for={%{}}
+            as={:message}
+            phx-submit="send_message"
+            phx-change="form_change"
+            class="size-full flex items-center"
+          >
+            <input
+              name="message"
+              value={@new_message}
+              placeholder="Type your message..."
+              class="mt-0 block w-full px-3 py-2 rounded-lg text-zinc-900 border border-zinc-300 focus:border-zinc-400 focus:ring-0 sm:text-sm sm:leading-6"
+              autocomplete="off"
+            />
+            <button
+              type="submit"
+              class="ml-2 px-4 py-2 bg-black border border-black text-white rounded-lg w-20 flex-shrink-0 hover:bg-zinc-800"
+            >
+              Send
+            </button>
+          </.form>
+        </div>
       </footer>
     </div>
     """
