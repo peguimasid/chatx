@@ -28,6 +28,10 @@ defmodule Chatx.Chat.ChatServer do
     GenServer.call(@name, :recent_messages)
   end
 
+  def clear_messages() do
+    GenServer.call(@name, :clear_messages)
+  end
+
   # Server callbacks
 
   def init(state) do
@@ -37,6 +41,11 @@ defmodule Chatx.Chat.ChatServer do
   def handle_call(:recent_messages, _from, state) do
     messages = Enum.reverse(state.messages)
     {:reply, messages, state}
+  end
+
+  def handle_call(:clear_messages, _from, state) do
+    new_state = %{state | messages: []}
+    {:reply, :ok, new_state}
   end
 
   def handle_call({:add_message, content, author}, _from, state) do
