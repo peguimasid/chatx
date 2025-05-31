@@ -70,7 +70,7 @@ defmodule ChatxWeb.HomeLive.Index do
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-sm mt-20">
+    <div class="mx-auto max-w-sm mt-10 md:mt-20">
       <div class="rounded-lg border p-6">
         <div class="flex items-center justify-center mb-4">
           <div class="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-sm text-green-700">

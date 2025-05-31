@@ -79,7 +79,7 @@ defmodule ChatxWeb.ChatLive.Index do
 
   def render(assigns) do
     ~H"""
-    <div class="flex flex-col h-screen w-screen overflow-auto">
+    <div class="flex flex-col h-dvh w-dvw overflow-auto">
       <header class="sticky inset-0 z-10 px-4 sm:px-6 lg:px-8 border-b border-zinc-100">
         <div class="flex items-center justify-between py-3 text-sm">
           <a href="/" class="flex gap-2 items-center">
@@ -150,7 +150,9 @@ defmodule ChatxWeb.ChatLive.Index do
                       {if message.author == @user_name, do: "You", else: message.author}
                     </span>
                     <span>•</span>
-                    <time>{Calendar.strftime(message.inserted_at, "%H:%M")}</time>
+                    <time id={"time-#{dom_id}"} phx-hook="LocalTime">
+                      {message.inserted_at}
+                    </time>
                   </div>
                   <p class="mt-1">{message.content}</p>
                 </div>
@@ -159,8 +161,8 @@ defmodule ChatxWeb.ChatLive.Index do
           </div>
         </div>
       </main>
-      <footer class="sticky bottom-0 z-10 flex w-full justify-center items-center min-h-14">
-        <div class="max-w-2xl w-full">
+      <footer class="sticky bottom-0 z-10 border-t border-zinc-100 flex w-full justify-center items-center py-4">
+        <div class="max-w-2xl w-full px-4 sm:px-6 lg:px-8">
           <.form
             for={%{}}
             as={:message}
