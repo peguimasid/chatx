@@ -7,7 +7,6 @@ defmodule ChatxWeb.UserSessionController do
     if String.length(name) > 0 do
       conn
       |> put_session(:user_name, name)
-      |> put_flash(:info, "Welcome, #{name}!")
       |> redirect(to: ~p"/chat")
     else
       conn
