@@ -3,6 +3,9 @@
 💬 A minimal real-time chat app built with Elixir and Phoenix LiveView.
 Designed as a learning project to explore LiveView features like dynamic presence, real-time updates, and interactive components — without the complexity of authentication or external dependencies.
 
+<img width="1512" alt="Screenshot 2025-05-31 at 6 03 03 PM" src="https://github.com/user-attachments/assets/213f94d3-02c6-4552-9c9c-3ba9abfabd81" />
+
+
 #### Features
 
 - Join with just a name, no login needed
