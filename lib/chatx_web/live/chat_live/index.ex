@@ -8,21 +8,22 @@ defmodule ChatxWeb.ChatLive.Index do
     %{user_name: user_name} = socket.assigns
 
     if connected?(socket) do
-      # Chatx.Chat.ChatServer.add_message("Hello guys", "masid")
-      # Chatx.Chat.ChatServer.add_message("Where are you?", "gmasid")
       Presence.track_user(user_name)
       Presence.subscribe()
       Chat.subscribe()
     end
 
     recent_messages = Chat.list_recent_messages()
-    online_users_count = count_other_users()
+    online_users_count = Presence.count_users()
+    online_users = Presence.list_users()
 
     socket =
       socket
       |> assign(:page_title, "#{online_users_count} users")
       |> assign(:online_users_count, online_users_count)
+      |> assign(:online_users, online_users)
       |> assign(:new_message, "")
+      |> assign(:show_users_modal, false)
       |> stream(:message, recent_messages, reset: true)
 
     {:ok, socket, layout: false}
@@ -47,23 +48,35 @@ defmodule ChatxWeb.ChatLive.Index do
     {:noreply, assign(socket, :new_message, message_content)}
   end
 
+  def handle_event("show_users_modal", _params, socket) do
+    {:noreply, assign(socket, :show_users_modal, true)}
+  end
+
+  def handle_event("hide_users_modal", _params, socket) do
+    {:noreply, assign(socket, :show_users_modal, false)}
+  end
+
   def handle_info({:user_joined, _presence}, socket) do
-    online_users_count = count_other_users()
+    online_users_count = Presence.count_users() - 1
+    online_users = Presence.list_users()
 
     socket =
       socket
       |> assign(:online_users_count, online_users_count)
+      |> assign(:online_users, online_users)
       |> assign(:page_title, "#{online_users_count} users")
 
     {:noreply, socket}
   end
 
   def handle_info({:user_left, _presence}, socket) do
-    online_users_count = count_other_users()
+    online_users_count = Presence.count_users() - 1
+    online_users = Presence.list_users()
 
     socket =
       socket
       |> assign(:online_users_count, online_users_count)
+      |> assign(:online_users, online_users)
       |> assign(:page_title, "#{online_users_count} users")
 
     {:noreply, socket}
@@ -78,10 +91,6 @@ defmodule ChatxWeb.ChatLive.Index do
     {:noreply, socket}
   end
 
-  defp count_other_users do
-    Presence.count_users() - 1
-  end
-
   def render(assigns) do
     ~H"""
     <div class="flex flex-col h-dvh w-dvw overflow-auto">
@@ -90,8 +99,11 @@ defmodule ChatxWeb.ChatLive.Index do
           <a href="/" class="flex gap-2 items-center">
             <.icon name="hero-chat-bubble-left-right" class="size-6" /> Chatx
           </a>
-          <div class="flex items-center gap-7">
-            <div class="flex items-center gap-2 relative">
+          <div class="flex items-center gap-5">
+            <button
+              phx-click="show_users_modal"
+              class="flex items-center gap-2 px-3 h-8 bg-green-50 border border-green-200 rounded-lg relative text-sm text-green-700"
+            >
               <p>
                 <%= cond do %>
                   <% @online_users_count == 0 -> %>
@@ -103,10 +115,10 @@ defmodule ChatxWeb.ChatLive.Index do
                 <% end %>
               </p>
               <div class="absolute -top-1 -right-1">
-                <div class="size-2 bg-green-500 rounded-full" />
-                <div class="absolute inset-0 size-2 bg-green-500 rounded-full animate-ping" />
+                <div class="size-2.5 bg-green-500 rounded-full" />
+                <div class="absolute inset-0 size-2.5 bg-green-500 rounded-full animate-ping" />
               </div>
-            </div>
+            </button>
             <.link
               href={~p"/users/leave-chat"}
               method="delete"
@@ -118,6 +130,26 @@ defmodule ChatxWeb.ChatLive.Index do
           </div>
         </div>
       </header>
+
+      <.modal :if={@show_users_modal} id="users-modal" show on_cancel={JS.push("hide_users_modal")}>
+        <h1>Online users:</h1>
+        <div class="space-y-3 mt-5">
+          <div :for={user <- @online_users} class="flex items-center gap-2">
+            <div class="size-8 bg-zinc-500 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0">
+              <p class="m-0 p-0">
+                {String.first(user.user_name) |> String.upcase()}
+              </p>
+            </div>
+            <span class="text-sm font-medium text-gray-900">
+              {if user.user_name == @user_name, do: "You (#{user.user_name})", else: user.user_name}
+            </span>
+            <div>
+              <div class="size-2 bg-green-500 rounded-full" />
+            </div>
+          </div>
+        </div>
+      </.modal>
+
       <main
         class="size-full overflow-auto px-4 py-20 sm:px-6 lg:px-8"
         id="chat-container"
