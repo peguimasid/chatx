@@ -70,7 +70,12 @@ defmodule ChatxWeb.ChatLive.Index do
   end
 
   def handle_info({:new_message, message}, socket) do
-    {:noreply, stream_insert(socket, :message, message)}
+    socket =
+      socket
+      |> stream_insert(:message, message)
+      |> push_event("scroll-to-bottom", %{})
+
+    {:noreply, socket}
   end
 
   defp count_other_users do
