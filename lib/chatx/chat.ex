@@ -11,6 +11,10 @@ defmodule Chatx.Chat do
     ChatServer.recent_messages()
   end
 
+  def clear_messages() do
+    ChatServer.clear_messages()
+  end
+
   def create_message(content, author) do
     ChatServer.add_message(content, author)
   end
