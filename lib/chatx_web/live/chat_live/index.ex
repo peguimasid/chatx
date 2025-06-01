@@ -105,14 +105,11 @@ defmodule ChatxWeb.ChatLive.Index do
               class="flex items-center gap-2 px-3 h-8 bg-green-50 border border-green-200 rounded-lg relative text-sm text-green-700"
             >
               <p>
-                <%= cond do %>
-                  <% @online_users_count == 0 -> %>
-                    Just you in the room
-                  <% @online_users_count == 1 -> %>
-                    1 user online
-                  <% true -> %>
-                    {@online_users_count} users online
-                <% end %>
+                {case @online_users_count do
+                  count when count <= 0 -> "Just you in the room"
+                  1 -> "1 user online"
+                  count -> "#{count} users online"
+                end}
               </p>
               <div class="absolute -top-1 -right-1">
                 <div class="size-2.5 bg-green-500 rounded-full" />
