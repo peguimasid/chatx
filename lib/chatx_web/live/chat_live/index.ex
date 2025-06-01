@@ -150,7 +150,7 @@ defmodule ChatxWeb.ChatLive.Index do
                       {if message.author == @user_name, do: "You", else: message.author}
                     </span>
                     <span>•</span>
-                    <time id={"time-#{dom_id}"} phx-hook="LocalTime">
+                    <time id={"time-#{dom_id}"} phx-hook="LocalTime" class="hidden">
                       {message.inserted_at}
                     </time>
                   </div>

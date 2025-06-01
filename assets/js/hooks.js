@@ -33,6 +33,8 @@ Hooks.LocalTime = {
     }).format(dt)
 
     this.el.textContent = formatted
+
+    this.el.classList.remove('hidden')
   }
 }
 
