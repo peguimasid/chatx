@@ -24,7 +24,7 @@ defmodule ChatxWeb.ChatLive.Index do
       |> assign(:online_users, online_users)
       |> assign(:new_message, "")
       |> assign(:show_users_modal, false)
-      |> stream(:message, recent_messages, reset: true)
+      |> stream(:messages, recent_messages, reset: true)
 
     {:ok, socket, layout: false}
   end
@@ -85,7 +85,7 @@ defmodule ChatxWeb.ChatLive.Index do
   def handle_info({:new_message, message}, socket) do
     socket =
       socket
-      |> stream_insert(:message, message)
+      |> stream_insert(:messages, message)
       |> push_event("scroll-to-bottom", %{})
 
     {:noreply, socket}
@@ -154,9 +154,17 @@ defmodule ChatxWeb.ChatLive.Index do
       >
         <div class="mx-auto max-w-2xl">
           <.flash_group flash={@flash} />
+          <div
+            :if={Enum.count(@streams.messages) == 0}
+            class="flex flex-col items-center justify-center h-64 text-gray-500"
+          >
+            <.icon name="hero-chat-bubble-left-ellipsis" class="size-12 mb-4" />
+            <h3 class="text-lg font-medium mb-2">No messages yet...</h3>
+            <p class="text-sm text-center">Be the first to start the conversation!</p>
+          </div>
           <div id="messages" phx-update="stream" class="space-y-4 mb-8">
             <div
-              :for={{dom_id, message} <- @streams.message}
+              :for={{dom_id, message} <- @streams.messages}
               id={dom_id}
               class={[
                 "flex",
