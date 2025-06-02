@@ -14,7 +14,7 @@ defmodule ChatxWeb.ChatLive.Index do
     end
 
     recent_messages = Chat.list_recent_messages()
-    online_users_count = Presence.count_users()
+    online_users_count = get_online_users_count()
     online_users = Presence.list_users()
 
     socket =
@@ -24,6 +24,7 @@ defmodule ChatxWeb.ChatLive.Index do
       |> assign(:online_users, online_users)
       |> assign(:new_message, "")
       |> assign(:show_users_modal, false)
+      |> assign(:messages_empty?, Enum.empty?(recent_messages))
       |> stream(:messages, recent_messages, reset: true)
 
     {:ok, socket, layout: false}
@@ -57,7 +58,7 @@ defmodule ChatxWeb.ChatLive.Index do
   end
 
   def handle_info({:user_joined, _presence}, socket) do
-    online_users_count = Presence.count_users() - 1
+    online_users_count = get_online_users_count()
     online_users = Presence.list_users()
 
     socket =
@@ -70,7 +71,7 @@ defmodule ChatxWeb.ChatLive.Index do
   end
 
   def handle_info({:user_left, _presence}, socket) do
-    online_users_count = Presence.count_users() - 1
+    online_users_count = get_online_users_count()
     online_users = Presence.list_users()
 
     socket =
@@ -86,9 +87,14 @@ defmodule ChatxWeb.ChatLive.Index do
     socket =
       socket
       |> stream_insert(:messages, message)
+      |> assign(:messages_empty?, false)
       |> push_event("scroll-to-bottom", %{})
 
     {:noreply, socket}
+  end
+
+  defp get_online_users_count do
+    max(0, Presence.count_users() - 1)
   end
 
   def render(assigns) do
@@ -155,7 +161,7 @@ defmodule ChatxWeb.ChatLive.Index do
         <div class="mx-auto max-w-2xl">
           <.flash_group flash={@flash} />
           <div
-            :if={Enum.count(@streams.messages) == 0}
+            :if={@messages_empty?}
             class="flex flex-col items-center justify-center h-64 text-gray-500"
           >
             <.icon name="hero-chat-bubble-left-ellipsis" class="size-12 mb-4" />
